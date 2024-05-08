@@ -42,7 +42,7 @@ bandwidth <- bw.diggle(trainingEyeData)
 numTestSubjects <- 19
 
 lambdaEst <- density(trainingEyeData, bandwidth,
-                      window=window) / numTestSubjects
+                     window=window, positive=TRUE) / numTestSubjects
 
 
 # simulera process

@@ -23,50 +23,18 @@ realData <- ppp(testSubject$locX, testSubject$locY, window)
 # används för intensitetsskattning
 trainingData <- subset(Bow, id != targetSubjectId & inpic == 1 & dur40 == 1
                        & timestamp < 60001)
+
 trainingEyeData <- ppp(trainingData$locX, trainingData$locY, window)
 bandwidth <- bw.diggle(trainingEyeData)
 numTestSubjects <- 19
 lambdaEst <- density(trainingEyeData, bandwidth,
-                     window=window) / numTestSubjects
+                     window=window, positive=TRUE) / numTestSubjects
 
 testSubject <- subset(Bow, id == targetSubjectId & inpic == 1 & dur40 == 1
                       & timestamp < 60001)
 
-# MLE för att hitta form- och skal- parametrar till fördelningen av sackad- och
-# fixeringstidslängder
-gammaFixation <- fitdistr(testSubject$duration, "gamma")
-gammaSaccade <- fitdistr(testSubject$presac, "gamma")
-
-
-# anpassa en gammafördelning på alla personers sackadlängder för att välja avståndet r
-allSubjects <- subset(Bow, inpic == 1 & dur40 == 1
-                       & timestamp < 60001)
-gammaFit <- fitdistr(allSubjects$jumplength, "gamma")
-x <- seq(0, max(allSubjects$jumplength), length.out = 100)
-hist(allSubjects$jumplength, prob = TRUE, 
-     main = "Histogram av sackadlängd", 
-     ylim = c(0,0.005),
-     xlab="Sackadlängd (pixlar)", ylab="Täthet")
-legend("topright", legend = c(paste("Form = ", round(gammaFit$estimate["shape"], digits=2), sep = ""), 
-                              legend = paste("Skala = ", round(1 / gammaFit$estimate["rate"], digits=2), sep = "")),  
-       fill = "#56B4E9")
-lines(x, dgamma(x, shape = gammaFit$estimate["shape"], 
-                rate = gammaFit$estimate["rate"]), col = "#56B4E9", lwd = 2)
-
-x1 <- seq(0, 2000, length.out = 1000) # 2000 valt för att nå till 1 på cdfValues nedan
-shape <- gammaFit$estimate[1]
-rate <- gammaFit$estimate[2]
-cdfValues <- pgamma(x1, shape, rate)
-plot(x1, cdfValues, type = "l", ylim = c(0, 1), 
-     xlab = "Sackadlängd (pixlar)", ylab = "Sannolikhet",
-     main = "Fördelningsfunktion av \n gammafördelningen av sackadlängd")
-
-q = 0.9 # välj kvantil för 'extrema' sackadlängder
-
 # hitta avståndet r
-allR <- data.frame(x=x1,y=cdfValues)
-allR$y <- round(allR$y, digits=2)
-r <- allR$x[which(allR$y==q)[1]]
+r <- 334
 
 nSim <- 40
 ppos <- rpoispp(50, nsim = nSim)
@@ -93,9 +61,10 @@ savePoint <- function(finalPattern, nextPoint, fixation, saccade,
 
 accProb <- 0.1 # välj sannolikhet att acceptera nya sackadlängder med
 
+cat ("Reglera extrema sackadlängder...")
 for (i in 1:nSim) {
   
-  point <- rpoint(1, lambdaEst) # första punkten
+  point <- rpoint(1, lambdaEst, positive=TRUE) # första punkten
   fixation <- rgamma(1, shape = gammaFixation$estimate[1],
                      rate = gammaFixation$estimate[2])
   saccade <- 0 
@@ -103,15 +72,14 @@ for (i in 1:nSim) {
   finalPattern <- point
   
   while (cumulativeTime < 60000) {
-    
-    nextPoint <- rpoint(1, lambdaEst)
+    nextPoint <- rpoint(1, lambdaEst, positive=TRUE)
     
     if (crossdist(point, nextPoint) > r) { 
-      jumplengthProb <- sample(c(0,1), prob = c(accProb,(1-accProb))) # slumpa siffran 0 med extremeProb, annars 1
+      jumplengthProb <- sample(c(0, 1), prob = c(accProb, (1-accProb))) # slumpa siffran 0 med extremeProb, annars 1
       
       if (jumplengthProb[1] == 0) { # om 0, acceptera punkten
         savedPoint <- savePoint(finalPattern, nextPoint, fixation, saccade,
-                           cumulativeTime, gammaFixation, gammaSaccade)
+                                cumulativeTime, gammaFixation, gammaSaccade)
         finalPattern <- savedPoint[[1]]
         fixation <- savedPoint[[2]]
         saccade <- savedPoint[[3]]
@@ -119,13 +87,15 @@ for (i in 1:nSim) {
         
         point <- nextPoint
       }
+      
       else { # om 1, acceptera inte punkten
         next
       }
     }
+    
     else { # acceptera punkten om euklidiska avståndet är mindre än r
       savedPoint <- savePoint(finalPattern, nextPoint, fixation, saccade,
-                         cumulativeTime, gammaFixation, gammaSaccade)
+                              cumulativeTime, gammaFixation, gammaSaccade)
       finalPattern <- savedPoint[[1]]
       fixation <- savedPoint[[2]]
       saccade <- savedPoint[[3]]
@@ -136,6 +106,7 @@ for (i in 1:nSim) {
   }
   simulations$ppos[[i]] <- finalPattern
 }
+cat("Klar!")
 
 nonHomogeneousProcess4 <- simulations$ppos
 nonHomogeneousSummary4 <- runSimulation(nonHomogeneousProcess4, realData,
