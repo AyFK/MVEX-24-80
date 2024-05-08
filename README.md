@@ -2,7 +2,8 @@
 
 ## Bow.RData
 Simulerad data som ej tillhör vår, eller orginalstudien från Jyväskylä University.
-Syftet är att kunna köra koden utan att behöva orginaldatan.
+Syftet är att kunna köra koden utan att behöva orginaldatan. Som konsekvens blir
+"jumplength" ej gamma fördelad som har konsekvenser för model4.R.
 
 ## imageAndBow.R
 Innehåller variabler som alla modeller använder sig av, dessa inkluderar:
@@ -16,14 +17,14 @@ Används för att jämföra processerna över tid.
 Används för att plotta jämnförelsestatistikor.
 
 ## model1.R
-Homogen Poissonprocess, homogen i tid och rum.
+Homogen Poissonprocess, test av CSR.
 
 ## model2.R
-Icke-homogen Poissonprocess, homogen i tid, icke-homogen i rum.
+Icke-homogen Poissonprocess.
 
 ## model3.R
 Icke-homogen Poissonprocess med tidsvarierande intensitet. Icke-homogen
 i tid och rum
 
 ## model4.R
-Spatio-remporal modell utifrån extrema sackadlängder.
+Spatio-remporal modell med beroende mellan fixeringar utifrån reglering av extrema sackadlängder.

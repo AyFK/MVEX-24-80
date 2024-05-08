@@ -48,7 +48,7 @@ hist(allSubjects$jumplength, prob = TRUE,
      ylim = c(0,0.005),
      xlab="Sackadlängd (pixlar)", ylab="Täthet")
 legend("topright", legend = c(paste("Form = ", round(gammaFit$estimate["shape"], digits=2), sep = ""), 
-                              legend = paste("Skala = ", round(gammaFit$estimate["rate"], digits=2), sep = "")),  
+                              legend = paste("Skala = ", round(1 / gammaFit$estimate["rate"], digits=2), sep = "")),  
        fill = "#56B4E9")
 lines(x, dgamma(x, shape = gammaFit$estimate["shape"], 
                 rate = gammaFit$estimate["rate"]), col = "#56B4E9", lwd = 2)
@@ -62,7 +62,6 @@ plot(x1, cdfValues, type = "l", ylim = c(0, 1),
      main = "Fördelningsfunktion av \n gammafördelningen av sackadlängd")
 
 q = 0.9 # välj kvantil för 'extrema' sackadlängder
-extremeProb <- 1-q
 
 # hitta avståndet r
 allR <- data.frame(x=x1,y=cdfValues)
@@ -92,6 +91,8 @@ savePoint <- function(finalPattern, nextPoint, fixation, saccade,
   return(list(finalPattern, fixation, saccade, cumulativeTime))
 }
 
+accProb <- 0.1 # välj sannolikhet att acceptera nya sackadlängder med
+
 for (i in 1:nSim) {
   
   point <- rpoint(1, lambdaEst) # första punkten
@@ -106,7 +107,7 @@ for (i in 1:nSim) {
     nextPoint <- rpoint(1, lambdaEst)
     
     if (crossdist(point, nextPoint) > r) { 
-      jumplengthProb <- sample(c(0,1), prob = c(extremeProb,(1-extremeProb))) # slumpa siffran 0 med extremeProb, annars 1
+      jumplengthProb <- sample(c(0,1), prob = c(accProb,(1-accProb))) # slumpa siffran 0 med extremeProb, annars 1
       
       if (jumplengthProb[1] == 0) { # om 0, acceptera punkten
         savedPoint <- savePoint(finalPattern, nextPoint, fixation, saccade,

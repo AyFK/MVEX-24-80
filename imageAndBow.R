@@ -15,8 +15,6 @@ imageMatrix <- rgb(painting[,,1], painting[,,2], painting[,,3])
 dim(imageMatrix) <- dim(painting)[1:2]
 image <- im(transmat(imageMatrix, "European", "spatstat"))
 
-
-
 # variabler som behövs i andra filer
 assign("image", image, envir = .GlobalEnv)
 assign("Bow", Bow, envir = .GlobalEnv)

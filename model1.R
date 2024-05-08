@@ -55,9 +55,10 @@ plotScanpathDist(homogeneousSummary, nSim, "Reslängd: Modell 1")
 plotIntersectionRatio(homogeneousSummary, nSim, "Skärningskvot: Modell 1")
 
 plotRatioAvgHistogram(homogeneousSummary, nSim, "Histogram: Modell 1")
-# icke-FSS
-#plotEnvelopes(realData)
 
-# FSS
-#plotEnvelopes(homogeneousProcess$`Simulation 1`)
+# icke-CSR
+plotEnvelopes(realData)
+
+# CSR
+plotEnvelopes(homogeneousProcess$`Simulation 1`)
 
