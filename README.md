@@ -1,7 +1,7 @@
 # Kod för kandidatarbete i matematisk statistik (GU : MSG900)
 
 ## Bow.RData
-Simulerad data som ej tillhör vår, eller orginalstudien från Jyväskylä University.
+Simulerad data (upp till 100000 ms) som ej tillhör vår, eller orginalstudien från Jyväskylä University.
 Syftet är att kunna köra koden utan att behöva orginaldatan. Som konsekvens blir
 "jumplength" ej gamma fördelad som gör att MLE metoden ej konvergerar för model4.R.
 
