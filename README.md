@@ -3,7 +3,7 @@
 ## Bow.RData
 Simulerad data som ej tillhör vår, eller orginalstudien från Jyväskylä University.
 Syftet är att kunna köra koden utan att behöva orginaldatan. Som konsekvens blir
-"jumplength" ej gamma fördelad som har konsekvenser för model4.R.
+"jumplength" ej gamma fördelad som gör att MLE metoden ej konvergerar för model4.R.
 
 ## imageAndBow.R
 Innehåller variabler som alla modeller använder sig av, dessa inkluderar:
@@ -27,4 +27,4 @@ Icke-homogen Poissonprocess med tidsvarierande intensitet. Icke-homogen
 i tid och rum
 
 ## model4.R
-Spatio-remporal modell med beroende mellan fixeringar utifrån reglering av extrema sackadlängder.
+Spatio-remporal modell med beroende mellan fixeringar utifrån reglering av extrema sackadlängder. Fungerar ej på grund av att "jumplength" ej är gammafördelad i "fake" datan.
